@@ -23,6 +23,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
+  storageClassName: retained
 ---
 apiVersion: apps/v1
 kind: Deployment

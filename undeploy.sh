@@ -6,11 +6,11 @@ error() {
 }
 kubectl version >/dev/null || error "Error: kubectl not setup"
 
-kubectl delete configmap gitlab-config
+kubectl delete configmap gitlab-config --namespace gitlab
 
 for i in *yml
 do
     echo "Create $i"
-    kubectl -f $i delete
+    kubectl --namespace gitlab -f $i delete
 done
 

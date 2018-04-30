@@ -13,6 +13,6 @@ spec:
   acme:
     config:
     - http01:
-        ingress: gitlab/gitlab
+        ingress: gitlab
       domains:
       - GITLAB_HOST
