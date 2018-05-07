@@ -19,6 +19,12 @@ Thanks to [sameerbsn gitlab](https://github.com/sameersbn/docker-gitlab)
 
 ## Manual steps
 
+Before running deploy.sh, run these two commands once:
+```
+helm install --name cert-manager --namespace kube-system stable/cert-manager
+helm install stable/nginx-ingress --namespace gitlab --name gitlab-ingress --set rbac.create=true
+```
+
 After setup, you will need to upload header logo (28-pixel height),
 and then customise login page (640x360px logo)
 
@@ -31,3 +37,9 @@ In admin/application_settings:
  * Set after sign out path
  * Enable plantuml
 
+If you want to enable gitlab-runner, login to the web interface,
+find the token, and then copy config-runner.yaml.sample to
+config-runner.yaml, edit to add token, and then run:
+```
+helm install --namespace gitlab-runner --name gitlab-runner -f config-runner.yaml gitlab/gitlab-runner
+```

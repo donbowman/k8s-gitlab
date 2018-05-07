@@ -14,20 +14,6 @@ spec:
     app: gitlab
     tier: gitlab
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: gitlab-pv-claim
-  labels:
-    app: gitlab
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 20Gi
-  storageClassName: retained
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
