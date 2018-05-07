@@ -30,7 +30,7 @@ you delete the chart, you will delete the storage. If you wish,
 you can manually create one or both volumes, and add them to the values.yaml
 as
 ```
-git-db-claim: pv-git-volume-claim
+git-db-claim: pv-git-db-claim
 git-volume-claim: pv-git-volume-claim
 ```
 
