@@ -1,3 +1,2 @@
-config
+values.yaml
 .helmignore
-config-runner.yaml

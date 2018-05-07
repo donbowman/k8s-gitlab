@@ -17,12 +17,68 @@ Don't make GITLAB_ROOT_EMAIL be a user you plan to login with OAUTH2
 Thanks to [Let's Encrypt Tutorial](https://github.com/ahmetb/gke-letsencrypt)
 Thanks to [sameerbsn gitlab](https://github.com/sameersbn/docker-gitlab)
 
+## Setup
+
+Copy values.yaml.sample to values.yaml, edit to suite.
+Run ```helm install -f values.yaml --name git .```
+
+## Persistent storage
+
+By default this uses the auto-provisioner to create two persistent
+volumes (1 for postgresql, 1 for the git repo).  This means that if
+you delete the chart, you will delete the storage. If you wish,
+you can manually create one or both volumes, and add them to the values.yaml
+as
+```
+git-db-claim: pv-git-volume-claim
+git-volume-claim: pv-git-volume-claim
+```
+
+And you may wish to create them as:
+
+```
+cat << EOF | kubectl apply -f -
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: retained
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-ssd
+reclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pv-git-volume-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: retained
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pv-git-db-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: retained
+EOF
+```
+
 ## Manual steps
 
-Before running deploy.sh, run these two commands once:
+This assumes you have run these two commands:
 ```
 helm install --name cert-manager --namespace kube-system stable/cert-manager
-helm install stable/nginx-ingress --namespace gitlab --name gitlab-ingress --set rbac.create=true
+helm install stable/nginx-ingress --name ingress --set rbac.create=true
 ```
 
 After setup, you will need to upload header logo (28-pixel height),
@@ -40,6 +96,7 @@ In admin/application_settings:
 If you want to enable gitlab-runner, login to the web interface,
 find the token, and then copy config-runner.yaml.sample to
 config-runner.yaml, edit to add token, and then run:
+
 ```
 helm install --namespace gitlab-runner --name gitlab-runner -f config-runner.yaml gitlab/gitlab-runner
 ```

@@ -1,0 +1,64 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-gitlab
+  labels:
+    app: {{ .Release.Name }}-gitlab
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-gitlab
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-gitlab
+    spec:
+      containers:
+        - name: gitlab
+          image: sameersbn/gitlab:10.7.2
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-configmap
+          env:
+            - name: DB_HOST
+              value: {{ .Release.Name }}-postgresql
+            - name: REDIS_HOST
+              value: {{ .Release.Name }}-redis
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+            - name: ssh
+              containerPort: 22
+              protocol: TCP
+          volumeMounts:
+            - name: git-data
+              mountPath: /home/git/data
+      volumes:
+        - name: git-data
+          persistentVolumeClaim:
+{{ if .Values.git_volume_claim }}
+            claimName: {{ .Values.git_volume_claim }}
+{{ else }}
+            claimName: {{ .Release.Name }}-pv-git-claim
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-pv-git-claim
+  labels:
+    app: {{ .Release.Name }}-gitlab
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+#  storageClassName: retained
+
+{{ end }}

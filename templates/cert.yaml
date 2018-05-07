@@ -1,0 +1,31 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ .Values.GITLAB_HOST }}-tls
+spec:
+  secretName: {{ .Values.GITLAB_HOST }}-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: {{ .Values.GITLAB_HOST }}
+  dnsNames:
+  - {{ .Values.GITLAB_HOST }}
+{{ if .Values.GITLAB_PAGES_DOMAIN }}
+  - {{ .Values.GITLAB_PAGES_DOMAIN }}
+{{ end  }}
+{{ if .Values.GITLAB_REGISTRY_HOST }}
+  - {{ .Values.GITLAB_REGISTRY_HOST }}
+{{ end  }}
+  acme:
+    config:
+    - http01:
+        ingress: {{ .Release.Name }}-ingress
+      domains:
+      - {{ .Values.GITLAB_HOST }}
+{{ if .Values.GITLAB_PAGES_DOMAIN }}
+      - {{ .Values.GITLAB_PAGES_DOMAIN }}
+{{ end  }}
+{{ if .Values.GITLAB_REGISTRY_HOST }}
+      - {{ .Values.GITLAB_REGISTRY_HOST }}
+{{ end  }}
+
