@@ -100,3 +100,11 @@ config-runner.yaml, edit to add token, and then run:
 ```
 helm install --namespace gitlab-runner --name gitlab-runner -f config-runner.yaml gitlab/gitlab-runner
 ```
+
+To enable SSH inbound, run:
+
+```
+helm upgrade -f ssh-ingress-map.yaml --set rbac.create=true nginx-ingress stable/nginx-ingress
+```
+
+(assuming the Release name you used was 'git', it may need editing)
