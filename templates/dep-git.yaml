@@ -46,7 +46,17 @@ spec:
               mountPath: /home/git/data
             - name: registry-data
               mountPath: /home/gitlab/data/shared/registry
+{{ if .Values.backup_claim }}
+            - name: backup
+              mountPath: /home/git/data/backups
+              subPath: git
+{{ end }}
       volumes:
+{{ if .Values.backup_claim }}
+        - name: backup
+          persistentVolumeClaim:
+            claimName: {{ .Values.backup_claim }}
+{{ end }}
         - name: registry-data
           persistentVolumeClaim:
 {{ if .Values.git_registry_claim }}

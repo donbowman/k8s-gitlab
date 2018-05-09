@@ -41,4 +41,4 @@ REGISTRY_HTTP_SECRET: XXXXXXXXXXXXXXXXXX
 #git_db_claim: pv-git-db-claim
 #git_volume_claim: pv-git-volume-claim
 #git_registry_claim: pv-registry-claim
-
+#backup_claim: pv-backup-claim

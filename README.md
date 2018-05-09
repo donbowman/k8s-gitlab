@@ -86,6 +86,10 @@ spec:
 EOF
 ```
 
+Optionally, you can create a claim to use as backup.
+The chart will mount a subPath of git on it.
+Set the backup_claim = claimname to use this feature.
+
 ## Manual steps
 
 This assumes you have run these two commands:
