@@ -28,6 +28,12 @@ spec:
               value: {{ .Release.Name }}-postgresql
             - name: REDIS_HOST
               value: {{ .Release.Name }}-redis
+{{ if .Values.GITLAB_REGISTRY_ENABLED }}
+            - name: GITLAB_REGISTRY_API_URL
+              value: http://{{ .Release.Name }}-registry:5000
+            - name:  GITLAB_REGISTRY_KEY_PATH
+              value: /home/git/data/certs/registry.key
+{{ end }}
           ports:
             - name: http
               containerPort: 80
@@ -38,7 +44,16 @@ spec:
           volumeMounts:
             - name: git-data
               mountPath: /home/git/data
+            - name: registry-data
+              mountPath: /home/gitlab/data/shared/registry
       volumes:
+        - name: registry-data
+          persistentVolumeClaim:
+{{ if .Values.git_registry_claim }}
+            claimName: {{ .Values.git_registry_claim }}
+{{ else }}
+            claimName: {{ .Release.Name }}-pv-registry-claim
+{{ end }}
         - name: git-data
           persistentVolumeClaim:
 {{ if .Values.git_volume_claim }}

@@ -45,3 +45,19 @@ spec:
   selector:
     app: {{ .Release.Name }}-postgresql
 
+{{ if .Values.GITLAB_REGISTRY_ENABLED }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-registry
+  labels:
+    app: {{ .Release.Name }}-registry
+spec:
+  ports:
+    - port: 5000
+      targetPort: 5000
+      name: registry
+  selector:
+    app: {{ .Release.Name }}-registry
+{{ end }}

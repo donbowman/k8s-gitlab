@@ -31,11 +31,14 @@ GITALY_TOKEN: XXXXXXXXXXXX
 
 GITLAB_BACKUP_SCHEDULE: daily
 
+REGISTRY_HTTP_SECRET: XXXXXXXXXXXXXXXXXX
+
 #GITLAB_PAGES_DOMAIN:
 #GITLAB_PAGES_ENABLED: true
 #GITLAB_REGISTRY_ENABLED: true
 #GITLAB_REGISTRY_HOST:
 
-#git-db-claim: pv-git-volume-claim
-#git-volume-claim: pv-git-volume-claim
+#git_db_claim: pv-git-db-claim
+#git_volume_claim: pv-git-volume-claim
+#git_registry_claim: pv-registry-claim
 

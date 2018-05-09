@@ -30,8 +30,9 @@ you delete the chart, you will delete the storage. If you wish,
 you can manually create one or both volumes, and add them to the values.yaml
 as
 ```
-git-db-claim: pv-git-db-claim
-git-volume-claim: pv-git-volume-claim
+git_db_claim: pv-git-db-claim
+git_volume_claim: pv-git-volume-claim
+git_registry_claim: pv-registry-claim
 ```
 
 And you may wish to create them as:
@@ -69,6 +70,18 @@ spec:
   resources:
     requests:
       storage: 5Gi
+  storageClassName: retained
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pv-registry-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
   storageClassName: retained
 EOF
 ```

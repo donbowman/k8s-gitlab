@@ -1,0 +1,86 @@
+{{ if .Values.GITLAB_REGISTRY_ENABLED }}
+
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-registry
+  labels:
+    app: {{ .Release.Name }}-registry
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-registry
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-registry
+    spec:
+      containers:
+        - name: registry
+          image: registry:latest
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-configmap
+          env:
+            - name: REGISTRY_LOG_LEVEL
+              value: info
+            - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
+              value: /registry
+            - name: REGISTRY_AUTH_TOKEN_REALM
+              value: https://{{ .Values.GITLAB_HOST }}/jwt/auth
+            - name: REGISTRY_AUTH_TOKEN_SERVICE
+              value: container_registry
+            - name: REGISTRY_AUTH_TOKEN_ISSUER
+              value: gitlab-issuer
+            - name: REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE
+              value: /certs/registry.crt
+            - name: REGISTRY_STORAGE_DELETE_ENABLED
+              value: "true"
+          ports:
+            - name: registry
+              containerPort: 5000
+              protocol: TCP
+          volumeMounts:
+            - name: cert-data
+              mountPath: /certs
+              subPath: certs
+              readOnly: true
+            - name: registry-data
+              mountPath: /registry
+      volumes:
+        - name: cert-data
+          persistentVolumeClaim:
+{{ if .Values.git_volume_claim }}
+            claimName: {{ .Values.git_volume_claim }}
+{{ else }}
+            claimName: {{ .Release.Name }}-pv-git-claim
+{{ end }}
+        - name: registry-data
+          persistentVolumeClaim:
+{{ if .Values.git_registry_claim }}
+            claimName: {{ .Values.git_registry_claim }}
+{{ else }}
+            claimName: {{ .Release.Name }}-pv-registry-claim
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-pv-registry-claim
+  labels:
+    app: {{ .Release.Name }}-registry
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+#  storageClassName: retained
+
+{{ end }}
+
+{{ end }}

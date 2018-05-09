@@ -5,6 +5,8 @@ metadata:
     kubernetes.io/ingress.class: nginx
     nginx.org/websocket-services: "{{ .Release.Name }}-gitlab"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    ingress.kubernetes.io/proxy-body-size: 100m
   name: {{ .Release.Name }}-ingress
   labels:
     app: {{ .Release.Name }}
@@ -32,8 +34,8 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: {{ .Release.Name }}-gitlab
-              servicePort: 80
+              serviceName: {{ .Release.Name }}-registry
+              servicePort: 5000
 {{ end }}
 
   tls:
@@ -46,5 +48,3 @@ spec:
           - {{ .Values.GITLAB_PAGES_DOMAIN }}
 {{ end }}
         secretName: {{ .Values.GITLAB_HOST }}-tls
-
-
