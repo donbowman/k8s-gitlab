@@ -23,7 +23,6 @@ TZ: UTC
 GITLAB_TIMEZONE: UTC
 REDIS_HOST: redis
 REDIS_PORT: 6379
-SMTP_ENABLED: false
 DB_EXTENSION: pg_trgm
 DEBUG: false
 GITLAB_PROJECTS_SNIPPETS: true
@@ -42,3 +41,12 @@ REGISTRY_HTTP_SECRET: XXXXXXXXXXXXXXXXXX
 #git_volume_claim: pv-git-volume-claim
 #git_registry_claim: pv-registry-claim
 #backup_claim: pv-backup-claim
+
+SMTP_ENABLED: false
+#GITLAB_EMAIL: user@domain
+#SMTP_USER: user@domain
+#SMTP_DOMAIN: domain
+#SMTP_HOST: smtp-relay.gmail.com
+#SMTP_PORT: 587
+#SMTP_TLS: true
+#SMTP_AUTHENTICATION: false
