@@ -65,6 +65,25 @@ spec:
           volumeMounts:
             - name: registry-data
               mountPath: /registry
+{{ if .Values.RESTIC_PASSWORD }}
+        - name: backup
+# NB: we are the registry, so we cannot pull from ourselves
+#          image: cr.agilicus.com/corp-tools/restic-backup
+          image: agilicus/restic-backup
+          imagePullPolicy: Always
+          args: ["auto"]
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-configmap
+          env:
+            - name: RESTIC_BACKUP_DIR
+              value: /registry
+            - name: RESTIC_HOSTNAME
+              value: registry
+          volumeMounts:
+            - name: registry-data
+              mountPath: /registry
+{{ end }}
       volumes:
         - name: registry-data
           persistentVolumeClaim:
