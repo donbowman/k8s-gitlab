@@ -44,26 +44,25 @@ spec:
           volumeMounts:
             - name: git-data
               mountPath: /home/git/data
-            - name: registry-data
-              mountPath: /home/gitlab/data/shared/registry
-{{ if .Values.backup_claim }}
-            - name: backup
+            - name: git-backup
               mountPath: /home/git/data/backups
-              subPath: git
+{{ if .Values.RESTIC_PASSWORD }}
+        - name: backup
+# NB: we are the registry, so we cannot pull from ourselves
+#          image: cr.agilicus.com/corp-tools/restic-backup
+          image: agilicus/restic-backup
+          imagePullPolicy: Always
+          args: ["auto"]
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-configmap
+          volumeMounts:
+            - name: git-backup
+              mountPath: /home/git/data/backups
 {{ end }}
       volumes:
-{{ if .Values.backup_claim }}
-        - name: backup
-          persistentVolumeClaim:
-            claimName: {{ .Values.backup_claim }}
-{{ end }}
-        - name: registry-data
-          persistentVolumeClaim:
-{{ if .Values.git_registry_claim }}
-            claimName: {{ .Values.git_registry_claim }}
-{{ else }}
-            claimName: {{ .Release.Name }}-pv-registry-claim
-{{ end }}
+        - name: git-backup
+          emptyDir: {}
         - name: git-data
           persistentVolumeClaim:
 {{ if .Values.git_volume_claim }}

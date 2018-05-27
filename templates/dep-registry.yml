@@ -1,5 +1,23 @@
 {{ if .Values.GITLAB_REGISTRY_ENABLED }}
 
+{{ if .Values.git_registry_claim }}
+{{ else }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-pv-registry-claim
+  labels:
+    app: {{ .Release.Name }}-registry
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+{{ end }}
+
+
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
@@ -37,7 +55,7 @@ spec:
             - name: REGISTRY_AUTH_TOKEN_ISSUER
               value: gitlab-issuer
             - name: REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE
-              value: /certs/registry.crt
+              value: /registry/certs/registry.crt
             - name: REGISTRY_STORAGE_DELETE_ENABLED
               value: "true"
           ports:
@@ -45,42 +63,15 @@ spec:
               containerPort: 5000
               protocol: TCP
           volumeMounts:
-            - name: cert-data
-              mountPath: /certs
-              subPath: certs
-              readOnly: true
             - name: registry-data
               mountPath: /registry
       volumes:
-        - name: cert-data
-          persistentVolumeClaim:
-{{ if .Values.git_volume_claim }}
-            claimName: {{ .Values.git_volume_claim }}
-{{ else }}
-            claimName: {{ .Release.Name }}-pv-git-claim
-{{ end }}
         - name: registry-data
           persistentVolumeClaim:
 {{ if .Values.git_registry_claim }}
             claimName: {{ .Values.git_registry_claim }}
 {{ else }}
             claimName: {{ .Release.Name }}-pv-registry-claim
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: {{ .Release.Name }}-pv-registry-claim
-  labels:
-    app: {{ .Release.Name }}-registry
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 20Gi
-#  storageClassName: retained
-
 {{ end }}
 
-{{ end }}
+{{ end }} #.Values.GITLAB_REGISTRY_ENABLED
