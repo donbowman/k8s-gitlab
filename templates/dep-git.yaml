@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: gitlab
-          image: sameersbn/gitlab:10.7.2
+          image: sameersbn/gitlab:10.8.2
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
